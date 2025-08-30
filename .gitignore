@@ -1,0 +1,10 @@
+# macOS noise
+.DS_Store
+profile
+
+# Unix executables & debug symbols
+build/unix/rnbench
+build/unix/rnbench-dbg
+build/unix/*.exe
+build/unix/*.dSYM/*
+build/unix/*.dSYM/*
