@@ -287,7 +287,7 @@ static void rle_fill_test_data(uint8_t data[], size_t size) {
     for(i = 0; i < size; ++i) {
         if(next_chunk_size == 0) {
             next_chunk_size = (size_t)rnd_get_int_range(1, 64);
-            next_chunk_value = (uint8_t)rnd_get_int_range(0, 255);
+            next_chunk_value = (uint8_t)rnd_get_int_range(0, 256);
         }
 
         data[i] = next_chunk_value;
