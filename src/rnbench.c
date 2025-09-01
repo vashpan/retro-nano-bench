@@ -484,9 +484,6 @@ unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
             case BENCH_TYPE_QSORT:
                 res = bench_quick_sort();
                 break;
-            default:
-                res.int_value = 0;
-                break;
         }
 
         results[choice] = res;
