@@ -35,8 +35,8 @@ typedef enum {
 /* utilities */
 
 void rnb_strzero(char* dst, size_t size) {
-    while(--size > 0) {
-        *dst = '\0';
+    while(size-- > 0) {
+        *dst++ = '\0';
     }
 }
 
