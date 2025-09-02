@@ -8,6 +8,10 @@ void progress_callback(int percent) {
         return;
     }
     
+    if (percent == 0) {
+        printf("Benchmarking");
+    }
+
     if (percent % 3 == 0) {
         putchar('.');
         fflush(stdout);
@@ -16,8 +20,7 @@ void progress_callback(int percent) {
 
 int main(int argc, char* argv[]) {
     printf("Retro Nano Bench v%s\n\n", RNBENCH_VERSION);
-    printf("Benchmarking");
-
+    
     unsigned int final_result = rnbench_run(progress_callback);
 
     printf("\n\nResult: %u\n", final_result);
