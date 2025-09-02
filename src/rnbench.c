@@ -440,6 +440,8 @@ static bench_result_t bench_quick_sort() {
     return result;
 }
 
+
+
 unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
     const double duration = 30.0;
     double start = platform_get_time();
@@ -447,6 +449,7 @@ unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
     int last_percent = -1;
     bench_result_t results[BENCH_TYPE_MAX];
     unsigned int result = 0; /* number of tests performed */
+    int i;
 
     /* seed RNG with a fixed value for deterministic test order */
     rnd_init(BENCH_RND_SEED);
@@ -457,10 +460,42 @@ unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
         return 0;
     }
 
+    /* verify results */
+    #ifdef DEBUG
+    platform_log("Verification:\n");
+    for (i = 0; i < BENCH_TYPE_MAX; ++i) {
+        bench_result_t res;
+
+        switch (i) {
+            case BENCH_TYPE_RAND:
+                res = bench_random_numbers();
+                platform_log("Random numbers: %f\n", res.double_value);
+                break;
+            case BENCH_TYPE_WC:
+                res = bench_word_count();
+                platform_log("Word count: %d\n", res.int_value);
+                break;
+            case BENCH_TYPE_CRC32:
+                res = bench_crc32_hashes();
+                platform_log("CRC32 hash: 0x%08X\n", res.uint32_value);
+                break;
+            case BENCH_TYPE_RLE:
+                res = bench_rle_compression();
+                platform_log("RLE compression factor: %f%%\n", res.double_value);
+                break;
+            case BENCH_TYPE_QSORT:
+                res = bench_quick_sort();
+                platform_log("Quicksort array sum: %u", res.uint32_value);
+                break;
+        }
+    }
+    platform_log("\n\n");
+    #endif
+
     progress_fn(0);
     last_percent = 0;
 
-    while ((now = platform_get_time()) - start < duration) {
+    while (now - start < duration) {
         int choice;
         bench_result_t res;
         int percent;
