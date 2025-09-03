@@ -1,5 +1,5 @@
 INCLUDES = -I "../../src"
-SRC = ../../src/*.c	../../src/platform/unix/*.c
+SRC = ../../src/*.c	../../src/platform/cli/*.c
 CFLAGS = -std=c89
 
 rnbench: $(SRC)
