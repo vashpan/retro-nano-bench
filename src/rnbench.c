@@ -447,7 +447,7 @@ unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
     double start = platform_get_time();
     double now = start;
     int last_percent = -1;
-    bench_result_t results[BENCH_TYPE_MAX];
+    volatile bench_result_t results[BENCH_TYPE_MAX];
     unsigned int result = 0; /* number of tests performed */
     int i;
 
@@ -524,9 +524,9 @@ unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
         results[choice] = res;
         ++result;
 
-        /* progress update only when percentage changes */
         now = platform_get_time();
-        
+
+        /* progress update only when percentage changes */
         percent = (int)(((now - start) / duration) * 100.0);
         if (percent < 0) percent = 0;
         if (percent > 100) percent = 100;
