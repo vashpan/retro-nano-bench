@@ -424,7 +424,7 @@ static bench_result_t bench_rle_compression() {
 }
 
 static bench_result_t bench_quick_sort() {
-    const size_t iterations = BENCH_QSORT_TEST_DATA_SIZE;
+    const size_t iterations = BENCH_QSORT_ITERATIONS;
     
     size_t i;
     uint32_t sum = 0;
@@ -439,8 +439,6 @@ static bench_result_t bench_quick_sort() {
     result.uint32_value = sum;
     return result;
 }
-
-
 
 unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
     const double duration = 30.0;
