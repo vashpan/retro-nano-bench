@@ -1,14 +1,11 @@
-#ifdef __linux__ 
-#define _POSIX_C_SOURCE 199309L /* to tell Linux Glibc to use proper POSIX standard */
-#endif
+#include "cli_platform.h"
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
-#include <sys/time.h>
-
-#if defined(_WIN32)
-#include <windows.h>
+#if CLI_PLATFORM_WINDOWS
+#  include <windows.h>
 #endif
 
 #include "platform.h"
@@ -21,14 +18,16 @@ void platform_log(const char *format, ...) {
     va_end(arglist);
 }
 
-#if defined(_WIN32)
+#if CLI_PLATFORM_WINDOWS
 static double win32_get_time() {
     LARGE_INTEGER freq, counter;
     QueryPerformanceFrequency(&freq);
     QueryPerformanceCounter(&counter);
     return (double)counter.QuadPart / (double)freq.QuadPart;
 }
-#else
+#endif
+
+#if CLI_PLATFORM_POSIX
 static double posix_get_time() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -37,9 +36,11 @@ static double posix_get_time() {
 #endif
 
 double platform_get_time() {
-#if defined(_WIN32)
+#if CLI_PLATFORM_WINDOWS
     return win32_get_time();
-#else
+#elif CLI_PLATFORM_POSIX
     return posix_get_time();
+#else
+    return 0.0;
 #endif
 }
