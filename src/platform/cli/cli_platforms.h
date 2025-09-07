@@ -17,6 +17,13 @@
 #  define CLI_PLATFORM_POSIX 0
 #endif
 
+/* Apple (Darwin/macOS, iOS simulators) */
+#if defined(__APPLE__) && defined(__MACH__)
+#  define CLI_PLATFORM_APPLE 1
+#else
+#  define CLI_PLATFORM_APPLE 0
+#endif
+
 /* Not found */
 #if !(CLI_PLATFORM_WINDOWS || CLI_PLATFORM_POSIX)
 #  error "Unsupported platform: define a platform layer or extend detection."

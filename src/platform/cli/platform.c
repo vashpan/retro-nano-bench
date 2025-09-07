@@ -8,6 +8,10 @@
 #  include <windows.h>
 #endif
 
+#if CLI_PLATFORM_POSIX
+#  include <sys/time.h>
+#endif
+
 #include "platform.h"
 
 void platform_log(const char *format, ...) {
@@ -29,9 +33,15 @@ static double win32_get_time() {
 
 #if CLI_PLATFORM_POSIX
 static double posix_get_time() {
+#if defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)
     struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1.0e9;
+#else
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (double)(tv.tv_sec + (tv.tv_usec / 1E6));
+#endif
 }
 #endif
 
