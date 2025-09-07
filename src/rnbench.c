@@ -102,6 +102,23 @@ static int rnd_get_int_range(int from, int to) {
 	return from + rnd_get_int() % range;
 }
 
+static bench_result_t bench_random_numbers() {
+    const int iterations = BENCH_RND_ITERATIONS;
+    
+    int i = 0;
+    double avg;
+    bench_result_t result;
+    
+    avg = 0.0;
+    for(i = 0; i < iterations; ++i) {
+        avg += rnd_get_int();
+        avg /= 2.0;
+    }
+    
+    result.double_value = avg;
+    return result;
+}
+
 /* word count */
 
 #define WC_TEST_WORDS_NUMBER 32
@@ -202,6 +219,25 @@ static void wc_create_test_text(char* text, int number_of_words, size_t max_size
     }
 }
 
+static bench_result_t bench_word_count() {
+    const int iterations = BENCH_WC_ITERATIONS;
+    
+    int number_of_words;
+    char test_text[WC_MAX_TEST_DATA_SIZE] = { 0 };
+    int total = 0;
+    int i;
+    bench_result_t result;
+    
+    for(i = 0; i < iterations; ++i) {
+        number_of_words = rnd_get_int_range(16, 32);
+        wc_create_test_text(test_text, number_of_words, WC_MAX_TEST_DATA_SIZE);
+        total += wc_count(test_text);
+    }
+    
+    result.int_value = total / iterations;
+    return result;
+}
+
 /* crc32 */
 
 #define CRC32_TEST_DATA_SIZE 128
@@ -239,6 +275,24 @@ static void crc32_fill_test_data(char array[], size_t size) {
     for(i = 0; i < size; ++i) {
         array[i] = (char)rnd_get_int_range(32, 126);
     }
+}
+
+static bench_result_t bench_crc32_hashes() {
+    const int iterations = BENCH_CRC32_ITERATIONS;
+    
+    uint32_t crc32num;
+    uint32_t result_hash = 0;
+    int i;
+    bench_result_t result;
+    
+    for(i = 0; i < iterations; ++i) {
+        crc32_fill_test_data(test_crc32_data, CRC32_TEST_DATA_SIZE);
+        crc32(test_crc32_data, CRC32_TEST_DATA_SIZE, &crc32num);
+        result_hash ^= crc32num;
+    }
+    
+    result.uint32_value = result_hash;
+    return result;
 }
 
 /* rle */
@@ -296,6 +350,28 @@ static void rle_fill_test_data(uint8_t data[], size_t size) {
     }
 }
 
+static bench_result_t bench_rle_compression() {
+    const int iterations = BENCH_RLE_ITERATIONS;
+    
+    size_t data_size = RLE_TEST_DATA_SIZE;
+    size_t compressed_size;
+    uint8_t compressed_data[RLE_TEST_DATA_SIZE * 3];
+    double compression_factor_sum = 0.0;
+    int i;
+    bench_result_t result;
+    
+    for(i = 0; i < iterations; ++i) {
+        rle_fill_test_data(test_rle_data, RLE_TEST_DATA_SIZE);
+        rnb_strzero((char*)compressed_data, RLE_TEST_DATA_SIZE * 3);
+        compressed_size = 0;
+        rle_compress((uint8_t*)test_rle_data, data_size, compressed_data, &compressed_size);
+        compression_factor_sum += ((double)compressed_size / (double)data_size);
+    }
+    
+    result.double_value = (compression_factor_sum / iterations) * 100.0;
+    return result;
+}
+
 /* quick sort */
 
 #define BENCH_QSORT_TEST_DATA_SIZE 64
@@ -345,84 +421,6 @@ static void qsort(int array[], int l, int r) {
     if(r > i) qsort(array, i, r);
 }
 
-/* running benchmarks */
-
-static bench_result_t bench_random_numbers() {
-    const int iterations = BENCH_RND_ITERATIONS;
-    
-    int i = 0;
-    double avg;
-    bench_result_t result;
-    
-    avg = 0.0;
-    for(i = 0; i < iterations; ++i) {
-        avg += rnd_get_int();
-        avg /= 2.0;
-    }
-    
-    result.double_value = avg;
-    return result;
-}
-
-static bench_result_t bench_word_count() {
-    const int iterations = BENCH_WC_ITERATIONS;
-    
-    int number_of_words;
-    char test_text[WC_MAX_TEST_DATA_SIZE] = { 0 };
-    int total = 0;
-    int i;
-    bench_result_t result;
-    
-    for(i = 0; i < iterations; ++i) {
-        number_of_words = rnd_get_int_range(16, 32);
-        wc_create_test_text(test_text, number_of_words, WC_MAX_TEST_DATA_SIZE);
-        total += wc_count(test_text);
-    }
-    
-    result.int_value = total / iterations;
-    return result;
-}
-
-static bench_result_t bench_crc32_hashes() {
-    const int iterations = BENCH_CRC32_ITERATIONS;
-    
-    uint32_t crc32num;
-    uint32_t result_hash = 0;
-    int i;
-    bench_result_t result;
-    
-    for(i = 0; i < iterations; ++i) {
-        crc32_fill_test_data(test_crc32_data, CRC32_TEST_DATA_SIZE);
-        crc32(test_crc32_data, CRC32_TEST_DATA_SIZE, &crc32num);
-        result_hash ^= crc32num;
-    }
-    
-    result.uint32_value = result_hash;
-    return result;
-}
-
-static bench_result_t bench_rle_compression() {
-    const int iterations = BENCH_RLE_ITERATIONS;
-    
-    size_t data_size = RLE_TEST_DATA_SIZE;
-    size_t compressed_size;
-    uint8_t compressed_data[RLE_TEST_DATA_SIZE * 3];
-    double compression_factor_sum = 0.0;
-    int i;
-    bench_result_t result;
-    
-    for(i = 0; i < iterations; ++i) {
-        rle_fill_test_data(test_rle_data, RLE_TEST_DATA_SIZE);
-        rnb_strzero((char*)compressed_data, RLE_TEST_DATA_SIZE * 3);
-        compressed_size = 0;
-        rle_compress((uint8_t*)test_rle_data, data_size, compressed_data, &compressed_size);
-        compression_factor_sum += ((double)compressed_size / (double)data_size);
-    }
-    
-    result.double_value = (compression_factor_sum / iterations) * 100.0;
-    return result;
-}
-
 static bench_result_t bench_quick_sort() {
     const size_t iterations = BENCH_QSORT_ITERATIONS;
     
@@ -440,6 +438,7 @@ static bench_result_t bench_quick_sort() {
     return result;
 }
 
+/* running benchmarks */
 unsigned int rnbench_run(rnbench_progress_fn progress_fn) {
     const double duration = 30.0;
     double start = platform_get_time();
