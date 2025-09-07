@@ -1,5 +1,5 @@
-#ifndef CLI_PLATFORM_H
-#define CLI_PLATFORM_H
+#ifndef CLI_PLATFORMS_H
+#define CLI_PLATFORMS_H
 
 /* Windows */
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
@@ -29,4 +29,4 @@
 #  endif
 #endif
 
-#endif /* CLI_PLATFORM_H */
+#endif /* CLI_PLATFORMS_H */
